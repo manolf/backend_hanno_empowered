@@ -16,7 +16,10 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$sql = "SELECT * FROM day"; // Change this to your table name
+$sql = "SELECT * FROM day
+        JOIN tabata ON (day.easy  = tabata.tabataId)
+        ORDER BY day.dayId"; 
+        
 $result = $conn->query($sql);
 
 $data = array();
