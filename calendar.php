@@ -8,8 +8,15 @@ $username = "root"; // Change this to your database username
 $password = "m2d2023"; // Change this to your database password
 $dbname = "Advent2023"; // Change this to your database name
 
+// database connection
+$dsn = 'mysql:host=localhost;dbname=Advent2023';
+$username = 'root';
+$password = 'm2d2023';
+
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
+
+//$conn = new PDO($dsn, $username, $password);
 
 // Check connection
 if ($conn->connect_error) {

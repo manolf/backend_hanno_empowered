@@ -10,50 +10,38 @@ $dsn = 'mysql:host=localhost;dbname=Advent2023';
 $username = 'root';
 $password = 'm2d2023';
 
-//day.php
+//user.php
 
 $pdo = new PDO($dsn, $username, $password);
 
 $data = array();
-if (isset($_GET['action']) && $_GET['action'] == 'fetchall') {
-
-    $query = "
-        SELECT * FROM day
-        JOIN tabata ON (day.easy  = tabata.tabataId)
-        ORDER BY day.dayId
-    ";
-    $stmt = $pdo->prepare($query);
-    $stmt->execute();
-    while($row = $stmt->fetch(PDO::FETCH_ASSOC))
-    {
-        $data[] = $row;
-    }
-    echo json_encode($data);
-}
-
-if (isset($_GET['action']) && $_GET['action'] === 'fetchsingle') {
+if (isset($_GET['action']) && $_GET['action'] == 'fetchuserdata') {
     
-    // Check if dayId is provided
-    if (isset($_GET['dayId'])) 
+    // Check if userId is provided
+    if (isset($_GET['userId'])) 
     {
-        $dayId = $_GET['dayId'];
+        $userId = $_GET['userId'];
 
         try {
             $pdo = new PDO($dsn, $username, $password);
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-            $sql =  "SELECT * FROM day
-                    JOIN tabata ON (day.easy  = tabata.tabataId)
-                     WHERE dayId = :dayId";
+            $sql = "SELECT dayId, tabata.tabataId, tabata.linkShort, tabata.tabataName
+            FROM calendar
+            JOIN tabata ON (tabata.tabataId = calendar.tabataId)
+            WHERE userId = :userId";
 
             $stmt = $pdo->prepare($sql);
-            $stmt->execute(['dayId' => $dayId]);
+            $stmt->execute(['userId' => $userId]);
 
-            // Fetch the data
-            $dayData = $stmt->fetch(PDO::FETCH_ASSOC);
+            // Fetches just one record
+            //$userData = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            //Fetches all data
+            $userData = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             // Return the data as JSON
-            echo json_encode($dayData);
+            echo json_encode($userData);
             
         } 
         catch (PDOException $e) {
@@ -64,8 +52,8 @@ if (isset($_GET['action']) && $_GET['action'] === 'fetchsingle') {
     } 
     else 
     {
-        // Handle case where dayId parameter is missing
-        echo json_encode(['error' => 'Missing dayId parameter']);
+        // Handle case where userId parameter is missing
+        echo json_encode(['error' => 'Missing userId parameter']);
     }
 
 }
@@ -160,6 +148,7 @@ if($received_data->action == 'delete')
     
     echo json_encode($output);
 }
+
 /*else {
     // Handle case where action parameter is missing or incorrect
     echo json_encode(['error' => 'Invalid action']);
